@@ -1,404 +1,353 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="monetag" content="c1d67408e543d9b920004a45d9f9da49">
-    <title>YouTube Thumbnail Downloader</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
-            color: white;
-            min-height: 100vh;
-            overflow-x: hidden;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-
-        header {
-            text-align: center;
-            padding: 30px 0;
-        }
-
-        .logo-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .youtube-logo {
-            font-size: 50px;
-            color: #ff0000;
-            margin-right: 15px;
-        }
-
-        .logo-text {
-            font-size: 36px;
-            font-weight: 800;
-            background: linear-gradient(45deg, #ff0000, #ff8c00, #ffff00);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .tagline {
-            font-size: 18px;
-            color: #e0e0e0;
-            margin-top: 10px;
-        }
-
-        .main-content {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .input-section {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            margin-bottom: 25px;
-        }
-
-        .url-input {
-            padding: 16px 20px;
-            border-radius: 50px;
-            border: none;
-            background: rgba(255, 255, 255, 0.15);
-            color: white;
-            font-size: 16px;
-            outline: none;
-            border: 2px solid transparent;
-        }
-
-        .url-input:focus {
-            border-color: #ff0000;
-        }
-
-        .download-btn {
-            padding: 16px 25px;
-            border-radius: 50px;
-            border: none;
-            background: #ff0000;
-            color: white;
-            font-size: 18px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .thumbnail-section {
-            display: none;
-            margin-top: 25px;
-        }
-
-        .section-title {
-            font-size: 26px;
-            margin-bottom: 20px;
-            text-align: center;
-            color: #ffcc00;
-        }
-
-        .thumbnails-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .thumbnail-card {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            overflow: hidden;
-        }
-
-        .thumbnail-img {
-            width: 100%;
-            height: 160px;
-            object-fit: cover;
-            border-bottom: 3px solid #ff0000;
-        }
-
-        .thumbnail-info {
-            padding: 15px;
-        }
-
-        .quality-badge {
-            padding: 6px 12px;
-            background: #ff0000;
-            border-radius: 20px;
-            font-size: 13px;
-            margin-bottom: 12px;
-            display: inline-block;
-        }
-
-        .download-thumb-btn {
-            width: 100%;
-            padding: 10px;
-            background: transparent;
-            border: 2px solid #ffcc00;
-            color: #ffcc00;
-            border-radius: 50px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .download-thumb-btn:hover {
-            background: #ffcc00;
-            color: #1a2a6c;
-        }
-
-        footer {
-            text-align: center;
-            padding: 25px 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
-
-        .footer-link {
-            color: #e0e0e0;
-            text-decoration: none;
-            padding: 6px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .footer-link:hover {
-            color: #ffcc00;
-        }
-
-        .copyright {
-            color: #b0b0b0;
-            font-size: 14px;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background: #1a2a6c;
-            padding: 30px;
-            border-radius: 20px;
-            max-width: 500px;
-            width: 90%;
-            position: relative;
-        }
-
-        .close-modal {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            color: #fff;
-            font-size: 28px;
-            cursor: pointer;
-        }
-
-        .modal-title {
-            font-size: 24px;
-            margin-bottom: 15px;
-            color: #ffcc00;
-            text-align: center;
-        }
-
-        .modal-text {
-            line-height: 1.5;
-            color: #e0e0e0;
-        }
-
-        @media (max-width: 768px) {
-            .logo-text { font-size: 28px; }
-            .youtube-logo { font-size: 40px; }
-            .main-content { padding: 20px; }
-            .thumbnails-grid { grid-template-columns: 1fr; }
-            .footer-links { gap: 15px; }
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Bat-Thumb — Batman-Style YouTube Thumbnail Downloader</title>
+  <meta name="description" content="Paste YouTube link aur turant 3 quality thumbnails download karein. Dark, bat-inspired UI." />
+  <!-- Open Graph -->
+  <meta property="og:title" content="Bat-Thumb — Batman-Style YouTube Thumbnail Downloader" />
+  <meta property="og:description" content="Paste YouTube link aur turant 3 quality thumbnails download karein. Dark, bat-inspired UI." />
+  <!-- Basic styling and fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#070709;
+      --card:#0e0f14;
+      --neon-blue: #00bfff;
+      --neon-yellow: #ffd43b;
+      --muted:#9aa3b2;
+      --glass: rgba(255,255,255,0.03);
+      --glow: 0 6px 24px rgba(0,191,255,0.08);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Roboto,Arial,Helvetica,sans-serif;background:radial-gradient(ellipse at top left, rgba(0,191,255,0.02), transparent 20%), var(--bg); color:#fff; -webkit-font-smoothing:antialiased}
+    header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px}
+    .logo-wrap{display:flex;align-items:center;gap:14px}
+    .bat-badge{width:64px;height:64px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#0f1720,#0a0b0f);border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,0.5)}
+    .brand{font-family:Orbitron, sans-serif;font-size:20px;letter-spacing:1px}
+    .tag{color:var(--muted);font-size:13px}
+    main{max-width:980px;margin:20px auto;padding:20px}
+    .hero{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent); padding:28px;border-radius:14px;box-shadow:var(--glow)}
+    .hero h1{font-family:Orbitron;margin:0;font-size:26px}
+    .hero p{margin:8px 0 18px;color:var(--muted)}
+    /* Input area */
+    .input-area{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+    .input-card{position:relative;flex:1;min-width:220px;background:var(--card);padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+    .logo-above-input{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+    .bat-svg{width:54px;height:34px}
+    .hand-svg{width:36px;height:36px;opacity:0.95}
+    input[type="text"]{width:100%;padding:14px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02);color:#fff;font-size:15px}
+    .controls{display:flex;gap:12px;align-items:center;margin-top:12px}
+    .btn{background:linear-gradient(90deg,var(--neon-blue),#33d7ff);border:none;padding:10px 16px;border-radius:10px;font-weight:700;cursor:pointer;box-shadow:0 6px 20px rgba(0,191,255,0.12);transition:transform .12s ease,box-shadow .12s}
+    .btn:hover{transform:translateY(-3px);box-shadow:0 12px 36px rgba(0,191,255,0.18)}
+    .btn.secondary{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);font-weight:600}
+    .note{font-size:13px;color:var(--muted);margin-top:8px}
+    /* Results */
+    .results{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:18px}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+    .card img{width:100%;border-radius:8px;display:block;background:#0b0b0b}
+    .label{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+    .q{font-weight:700;color:var(--neon-yellow)}
+    .size{font-size:13px;color:var(--muted)}
+    .download-row{display:flex;gap:8px;margin-top:8px}
+    .small-btn{flex:1;padding:8px;border-radius:8px;border:none;background:rgba(255,255,255,0.03);color:#fff;cursor:pointer}
+    .zip{background:linear-gradient(90deg,var(--neon-yellow),#ffd966);color:#111;font-weight:700}
+    .err{color:#ff6b6b;padding:10px;margin-top:12px;border-radius:8px;background:rgba(255,107,107,0.06)}
+    footer{margin-top:18px;padding:18px 24px;display:flex;justify-content:space-between;align-items:center;color:var(--muted)}
+    footer a{color:var(--muted);text-decoration:none;margin-left:12px}
+    /* small screens */
+    @media (max-width:600px){
+      .hero h1{font-size:20px}
+      header{padding:12px}
+    }
+    /* subtle animated background skyline */
+    .skyline{position:fixed;left:0;right:0;bottom:0;height:120px;pointer-events:none;background-image:
+      linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,0.6)),
+      radial-gradient(circle at 10% 20%, rgba(0,191,255,0.03), transparent 10%),
+      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="120" viewBox="0 0 1200 120"><rect fill="%23070709" width="1200" height="120"/><g fill="%230b0b0b"><rect x="20" y="40" width="18" height="80"/><rect x="50" y="20" width="24" height="100"/><rect x="90" y="10" width="30" height="110"/><rect x="140" y="0" width="40" height="120"/></g></svg>');
+      background-repeat:repeat-x;opacity:0.45;mix-blend-mode:overlay;transform:translateZ(0)}
+  </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="logo-container">
-                <i class="fab fa-youtube youtube-logo"></i>
-                <h1 class="logo-text">Thumbnail Downloader</h1>
-            </div>
-            <p class="tagline">Download high-quality YouTube thumbnails in multiple resolutions with one click!</p>
-        </header>
-
-        <main>
-            <section class="main-content">
-                <div class="input-section">
-                    <input type="text" class="url-input" placeholder="Paste YouTube video URL here...">
-                    <button class="download-btn">
-                        <i class="fas fa-download"></i> Get Thumbnails
-                    </button>
-                </div>
-
-                <div class="thumbnail-section">
-                    <h2 class="section-title">Available Thumbnails</h2>
-                    <div class="thumbnails-grid"></div>
-                </div>
-            </section>
-        </main>
-
-        <footer>
-            <div class="footer-links">
-                <a class="footer-link" onclick="showModal('privacy')">Privacy Policy</a>
-                <a class="footer-link" onclick="showModal('about')">About Us</a>
-                <a class="footer-link" onclick="showModal('terms')">Terms & Conditions</a>
-            </div>
-            <p class="copyright">© 2023 YouTube Thumbnail Downloader</p>
-        </footer>
+  <header>
+    <div class="logo-wrap">
+      <div class="bat-badge" aria-hidden="true">
+        <!-- bat-inspired SVG (original design, not DC logo) -->
+        <svg class="bat-svg" viewBox="0 0 120 64" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Bat-Thumb logo">
+          <defs>
+            <linearGradient id="g1" x1="0" x2="1">
+              <stop offset="0" stop-color="#ffd43b"/><stop offset="1" stop-color="#ffd700"/>
+            </linearGradient>
+          </defs>
+          <path d="M60 6c-8 0-14 4-18 8-6-4-14-6-22 2-2 2-6 8-6 14 0 0 10-6 18-4 6 2 8 8 14 10 6 2 12-2 22-2 10 0 16 4 22 2 8-2 8-8 14-10 8-2 18 4 18 4 0-6-4-12-6-14-8-8-16-6-22-2-4-4-10-8-18-8z" fill="url(#g1)"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand">BAT-THUMB</div>
+        <div class="tag">Dark Mode. HD Power.</div>
+      </div>
     </div>
+    <div class="tag">Instant HD thumbnails</div>
+  </header>
 
-    <!-- Modals -->
-    <div class="modal" id="privacy-modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeModal('privacy')">&times;</span>
-            <h2 class="modal-title">Privacy Policy</h2>
-            <div class="modal-text">
-                <p>We respect your privacy. No data is stored on our servers.</p>
-            </div>
+  <main>
+    <section class="hero" aria-labelledby="main-heading">
+      <h1 id="main-heading">Download YouTube Thumbnails — Batman Style</h1>
+      <p>Paste YouTube video link aur "Summon Thumbnails" par click karo. 3 alag quality thumbnails turant aayenge.</p>
+
+      <div class="input-area">
+        <div class="input-card" role="region" aria-label="YouTube Link Input">
+          <div class="logo-above-input">
+            <!-- bat-inspired small svg -->
+            <svg class="bat-svg" viewBox="0 0 120 34" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M60 2c-6 0-10 3-12 6-4-3-10-4-16 1-1 1-4 5-4 9 0 0 7-4 13-3 4 1 6 5 10 6 4 1 8-1 14-1 6 0 10 3 14 1 6-1 6-5 10-6 6-1 13 3 13 3 0-4-2-8-4-9-6-5-12-4-16-1-2-3-6-6-12-6z" fill="#00bfff"/>
+            </svg>
+
+            <!-- pointing hand (stylized glove) -->
+            <svg class="hand-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M6 12v6a2 2 0 0 0 2 2h7a1 1 0 0 0 .9-.55L18.6 16H20a2 2 0 0 0 0-4h-7V6a2 2 0 1 0-4 0v6H6z" fill="#ffd43b"/>
+            </svg>
+
+            <div style="font-size:13px;color:var(--muted)">Your YouTube video link here</div>
+          </div>
+
+          <label for="ytlink" class="sr-only" style="display:none">YouTube Link</label>
+          <input id="ytlink" type="text" placeholder="https://youtu.be/VIDEO_ID  —  Paste link yahan" aria-label="YouTube link input" />
+
+          <div class="controls">
+            <button id="gen" class="btn" aria-live="polite">Summon Thumbnails</button>
+            <button id="clearBtn" class="btn secondary">Clear</button>
+            <div style="flex:1"></div>
+          </div>
+          <div class="note">Only public videos supported. Client-side operation — koi data server par nahi jayega.</div>
+          <div id="error" role="alert" aria-live="assertive"></div>
         </div>
-    </div>
+      </div>
 
-    <div class="modal" id="about-modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeModal('about')">&times;</span>
-            <h2 class="modal-title">About Us</h2>
-            <div class="modal-text">
-                <p>Free tool to download YouTube thumbnails instantly.</p>
-            </div>
-        </div>
-    </div>
+      <div id="results" class="results" aria-live="polite"></div>
 
-    <div class="modal" id="terms-modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeModal('terms')">&times;</span>
-            <h2 class="modal-title">Terms & Conditions</h2>
-            <div class="modal-text">
-                <p>Use thumbnails responsibly according to YouTube's terms.</p>
-            </div>
-        </div>
-    </div>
+    </section>
 
-    <script>
-        // Register Service Worker
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js')
-                .then(registration => console.log('Service Worker registered'))
-                .catch(error => console.log('Service Worker registration failed'));
+    <footer>
+      <div>© Bat-Thumb</div>
+      <div>
+        <a href="privacy.html" target="_blank" rel="noopener">Privacy Policy</a>
+        <a href="terms.html" target="_blank" rel="noopener">Terms & Conditions</a>
+        <a href="about.html" target="_blank" rel="noopener">About Us</a>
+      </div>
+    </footer>
+  </main>
+
+  <div class="skyline" aria-hidden="true"></div>
+
+  <!-- JS: thumbnail logic -->
+  <script>
+    // Utility: extract YouTube video ID from many URL forms
+    function extractVideoId(url){
+      if(!url) return null;
+      // trim
+      url = url.trim();
+      // support direct id
+      const idRegex = /^[a-zA-Z0-9_-]{11}$/;
+      if(idRegex.test(url)) return url;
+      try{
+        // try URL parsing
+        const u = new URL(url);
+        // youtu.be
+        if(u.hostname.includes('youtu.be')) {
+          return u.pathname.slice(1).split(/[\?&]/)[0];
+        }
+        // youtube.com
+        if(u.hostname.includes('youtube.com')){
+          if(u.searchParams.get('v')) return u.searchParams.get('v').split(/[\?&]/)[0];
+          // embed path
+          const parts = u.pathname.split('/');
+          const embedIdx = parts.indexOf('embed');
+          if(embedIdx !== -1 && parts[embedIdx+1]) return parts[embedIdx+1];
+        }
+      } catch(e){
+        // fallback regex
+      }
+      // fallback regex patterns
+      const reg = /(?:v=|\/v\/|\/embed\/|youtu\.be\/|\/shorts\/)([A-Za-z0-9_-]{11})/;
+      const m = url.match(reg);
+      return m ? m[1] : null;
+    }
+
+    function getThumbnailUrls(id){
+      return [
+        {key:'HD', label:'maxresdefault', url:`https://i.ytimg.com/vi/${id}/maxresdefault.jpg`},
+        {key:'HQ', label:'hqdefault', url:`https://i.ytimg.com/vi/${id}/hqdefault.jpg`},
+        {key:'MQ', label:'mqdefault', url:`https://i.ytimg.com/vi/${id}/mqdefault.jpg`}
+      ];
+    }
+
+    function showError(msg){
+      const el = document.getElementById('error');
+      el.innerHTML = '<div class="err">'+msg+'</div>';
+    }
+
+    function clearError(){ document.getElementById('error').innerHTML=''; }
+
+    function bytesToNice(b){
+      if(!b) return '';
+      if(b<1024) return b+' B';
+      if(b<1024*1024) return (b/1024).toFixed(1)+' KB';
+      return (b/1024/1024).toFixed(2)+' MB';
+    }
+
+    async function downloadBlobFromUrl(url, filename){
+      try{
+        const resp = await fetch(url, {mode:'cors'});
+        if(!resp.ok) throw new Error('Unable to fetch image');
+        const blob = await resp.blob();
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+      } catch(e){
+        alert('Download failed: '+e.message);
+      }
+    }
+
+    document.getElementById('gen').addEventListener('click', async ()=>{
+      clearError();
+      const val = document.getElementById('ytlink').value;
+      const id = extractVideoId(val);
+      const results = document.getElementById('results');
+      results.innerHTML = '';
+      if(!id){
+        showError('Invalid link ya video ID. Dobara check karein.');
+        return;
+      }
+      // build cards
+      const thumbs = getThumbnailUrls(id);
+      // show skeleton cards first
+      thumbs.forEach(t=>{
+        const c = document.createElement('div');
+        c.className='card';
+        c.innerHTML = '<div style="height:140px;display:flex;align-items:center;justify-content:center;color:var(--muted)">Loading...</div><div class="label"><div class="q">'+t.key+' — '+t.label+'</div><div class="size"></div></div><div class="download-row"><button class="small-btn">Download</button></div>';
+        results.appendChild(c);
+      });
+
+      // attempt to load each image with fallback logic
+      for(let i=0;i<thumbs.length;i++){
+        const t = thumbs[i];
+        const card = results.children[i];
+        // try to load url; if 404, fallback to next (for maxres -> hq)
+        let finalUrl = t.url;
+        try{
+          // test with HEAD first (some CDNs block HEAD; use fetch of small range)
+          const test = await fetch(finalUrl, {method:'GET',mode:'cors'});
+          if(!test.ok){
+            // fallback: for maxres try hqdefault
+            if(t.label==='maxresdefault'){
+              finalUrl = finalUrl.replace('maxresdefault','hqdefault');
+              const t2 = await fetch(finalUrl, {method:'GET',mode:'cors'});
+              if(!t2.ok) throw new Error('No image');
+            } else {
+              throw new Error('No image');
+            }
+          }
+        } catch(e){
+          // final fallback attempt: use default thumbnail (sddefault)
+          finalUrl = `https://i.ytimg.com/vi/${id}/sddefault.jpg`;
         }
 
-        // Thumbnail functionality
-        document.querySelector('.download-btn').addEventListener('click', function() {
-            const urlInput = document.querySelector('.url-input').value.trim();
-            if (!urlInput) {
-                alert('Please enter a YouTube URL');
-                return;
-            }
-            
-            const videoId = extractVideoId(urlInput);
-            if (!videoId) {
-                alert('Please enter a valid YouTube URL');
-                return;
-            }
-            
-            const thumbnailSection = document.querySelector('.thumbnail-section');
-            thumbnailSection.style.display = 'block';
-            
-            const qualities = [
-                { name: 'Max Resolution', code: 'maxresdefault' },
-                { name: 'High Quality', code: 'hqdefault' },
-                { name: 'Medium Quality', code: 'mqdefault' }
-            ];
-            
-            const thumbnailsGrid = document.querySelector('.thumbnails-grid');
-            thumbnailsGrid.innerHTML = '';
-            
-            qualities.forEach(quality => {
-                const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/${quality.code}.jpg`;
-                const thumbnailCard = document.createElement('div');
-                thumbnailCard.className = 'thumbnail-card';
-                thumbnailCard.innerHTML = `
-                    <img src="${thumbnailUrl}" alt="Thumbnail" class="thumbnail-img">
-                    <div class="thumbnail-info">
-                        <span class="quality-badge">${quality.name}</span>
-                        <button class="download-thumb-btn" onclick="downloadImage('${thumbnailUrl}', '${quality.name}')">
-                            <i class="fas fa-download"></i> Download
-                        </button>
-                    </div>
-                `;
-                thumbnailsGrid.appendChild(thumbnailCard);
-            });
+        // replace card content
+        card.innerHTML = '';
+        const img = document.createElement('img');
+        img.alt = id + ' thumbnail ' + t.key;
+        img.loading = 'lazy';
+        img.src = finalUrl;
+        img.addEventListener('error', ()=>{
+          // if even this fails
+          card.innerHTML = '<div class="err">Thumbnail unavailable</div>';
         });
-        
-        function extractVideoId(url) {
-            const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
-            const match = url.match(regExp);
-            return (match && match[7].length === 11) ? match[7] : null;
+        card.appendChild(img);
+
+        const lab = document.createElement('div');
+        lab.className = 'label';
+        lab.innerHTML = `<div class="q">${t.key} — ${t.label}</div><div class="size">Preview</div>`;
+        card.appendChild(lab);
+
+        const drow = document.createElement('div');
+        drow.className = 'download-row';
+        const dlBtn = document.createElement('button');
+        dlBtn.className = 'small-btn';
+        dlBtn.textContent = 'Download';
+        dlBtn.addEventListener('click', ()=> downloadBlobFromUrl(finalUrl, `${id}_${t.label}.jpg`));
+        drow.appendChild(dlBtn);
+
+        // optional copy link
+        const cp = document.createElement('button');
+        cp.className = 'small-btn';
+        cp.textContent = 'Copy Link';
+        cp.addEventListener('click', ()=>{
+          navigator.clipboard?.writeText(finalUrl).then(()=> alert('Link copied'));
+        });
+        drow.appendChild(cp);
+
+        card.appendChild(drow);
+      }
+
+      // add Download All ZIP button (client-side using JSZip)
+      const zipRow = document.createElement('div');
+      zipRow.style.gridColumn = '1 / -1';
+      zipRow.style.display='flex';
+      zipRow.style.justifyContent='flex-end';
+      zipRow.style.marginTop='8px';
+      zipRow.innerHTML = '<button id="dlAll" class="btn zip">Download All (ZIP)</button>';
+      results.appendChild(zipRow);
+
+      document.getElementById('dlAll').addEventListener('click', async ()=>{
+        // load JSZip dynamically
+        if(!window.JSZip){
+          const s = document.createElement('script');
+          s.src = 'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js';
+          document.head.appendChild(s);
+          await new Promise(r=>s.onload = r);
         }
-        
-        function downloadImage(url, quality) {
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `thumbnail_${quality}.jpg`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-        
-        // Modal functionality
-        function showModal(type) {
-            document.getElementById(`${type}-modal`).style.display = 'flex';
-        }
-        
-        function closeModal(type) {
-            document.getElementById(`${type}-modal`).style.display = 'none';
-        }
-        
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            if (event.target.classList.contains('modal')) {
-                event.target.style.display = 'none';
-            }
-        }
-    </script>
+        const zip = new JSZip();
+        const imgs = results.querySelectorAll('img');
+        const promises = Array.from(imgs).map(async (img)=>{
+          try{
+            const r = await fetch(img.src);
+            const b = await r.blob();
+            const name = img.alt.replace(/\s+/g,'_') + '.jpg';
+            zip.file(name, b);
+          } catch(e){
+            console.warn('skip', img.src);
+          }
+        });
+        await Promise.all(promises);
+        const content = await zip.generateAsync({type:'blob'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(content);
+        a.download = id + '_thumbnails.zip';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+      });
+
+    });
+
+    document.getElementById('clearBtn').addEventListener('click', ()=>{
+      document.getElementById('ytlink').value='';
+      document.getElementById('results').innerHTML='';
+      clearError();
+    });
+
+    // keyboard: enter to generate
+    document.getElementById('ytlink').addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter') document.getElementById('gen').click();
+    });
+
+  </script>
 </body>
-</html>
+                </html>
